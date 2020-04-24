@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Roverr/rtsp-stream/core/streamer"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 	"github.com/Roverr/rtsp-stream/core/blacklist"
 	"github.com/Roverr/rtsp-stream/core/config"
 	"github.com/julienschmidt/httprouter"
-	"github.com/riltech/streamer"
 	"github.com/sirupsen/logrus"
 )
 
@@ -452,7 +452,6 @@ func (c *Controller) StaticFileHandler(w http.ResponseWriter, req *http.Request,
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	defer c.fileServer.ServeHTTP(w, req)
 	filepath := ps.ByName("filepath")
 	req.URL.Path = filepath
 	id := c.getIDByPath(filepath)
@@ -473,6 +472,7 @@ func (c *Controller) StaticFileHandler(w http.ResponseWriter, req *http.Request,
 		return
 	}
 
+	defer c.fileServer.ServeHTTP(w, req)
 	stream, ok := c.streams[id]
 	if !ok {
 		return
